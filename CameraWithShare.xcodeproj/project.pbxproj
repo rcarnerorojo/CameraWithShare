@@ -12,6 +12,8 @@
 		E67DDAF81A9C9ED5005FD091 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E67DDAF71A9C9ED5005FD091 /* Images.xcassets */; };
 		E67DDAFB1A9C9ED5005FD091 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E67DDAF91A9C9ED5005FD091 /* LaunchScreen.xib */; };
 		E67DDB071A9C9ED5005FD091 /* CameraWithShareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E67DDB061A9C9ED5005FD091 /* CameraWithShareTests.m */; };
+		E67DDB131A9C9EFD005FD091 /* RCRCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E67DDB111A9C9EFD005FD091 /* RCRCameraViewController.m */; };
+		E67DDB141A9C9EFD005FD091 /* RCRCameraViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E67DDB121A9C9EFD005FD091 /* RCRCameraViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,6 +37,9 @@
 		E67DDB001A9C9ED5005FD091 /* CameraWithShareTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CameraWithShareTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E67DDB051A9C9ED5005FD091 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E67DDB061A9C9ED5005FD091 /* CameraWithShareTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CameraWithShareTests.m; sourceTree = "<group>"; };
+		E67DDB101A9C9EFD005FD091 /* RCRCameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCRCameraViewController.h; sourceTree = "<group>"; };
+		E67DDB111A9C9EFD005FD091 /* RCRCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCRCameraViewController.m; sourceTree = "<group>"; };
+		E67DDB121A9C9EFD005FD091 /* RCRCameraViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RCRCameraViewController.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +86,9 @@
 				E67DDAF71A9C9ED5005FD091 /* Images.xcassets */,
 				E67DDAF91A9C9ED5005FD091 /* LaunchScreen.xib */,
 				E67DDAF01A9C9ED5005FD091 /* Supporting Files */,
+				E67DDB101A9C9EFD005FD091 /* RCRCameraViewController.h */,
+				E67DDB111A9C9EFD005FD091 /* RCRCameraViewController.m */,
+				E67DDB121A9C9EFD005FD091 /* RCRCameraViewController.xib */,
 			);
 			path = CameraWithShare;
 			sourceTree = "<group>";
@@ -155,6 +163,7 @@
 		E67DDAE51A9C9ED5005FD091 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = RCR;
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Ramón Carnero Rojo";
 				TargetAttributes = {
@@ -192,6 +201,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E67DDAFB1A9C9ED5005FD091 /* LaunchScreen.xib in Resources */,
+				E67DDB141A9C9EFD005FD091 /* RCRCameraViewController.xib in Resources */,
 				E67DDAF81A9C9ED5005FD091 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -210,6 +220,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E67DDB131A9C9EFD005FD091 /* RCRCameraViewController.m in Sources */,
 				E67DDAF61A9C9ED5005FD091 /* AppDelegate.m in Sources */,
 				E67DDAF31A9C9ED5005FD091 /* main.m in Sources */,
 			);
@@ -394,6 +405,7 @@
 				E67DDB0C1A9C9ED5005FD091 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		E67DDB0D1A9C9ED5005FD091 /* Build configuration list for PBXNativeTarget "CameraWithShareTests" */ = {
 			isa = XCConfigurationList;
@@ -402,6 +414,7 @@
 				E67DDB0F1A9C9ED5005FD091 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
