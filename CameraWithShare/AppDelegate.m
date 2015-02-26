@@ -19,14 +19,14 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    RCRCameraViewController *cVC = [RCRCameraViewController new];
+    RCRCameraViewController *cVC = [[RCRCameraViewController alloc] initWithNibName:nil bundle:nil];
     
     UINavigationController *nC = [[UINavigationController alloc]initWithRootViewController:cVC];
     
     self.window.rootViewController = nC;
     
     // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor whiteColor];
+    self.window.backgroundColor = [UIColor blackColor];
     [self.window makeKeyAndVisible];
     return YES;
 }

@@ -12,6 +12,9 @@
 
 @property UIImagePickerController *imagePicker;
 
+@property (weak, nonatomic) IBOutlet UIView *overlayView;
+@property (weak, nonatomic) IBOutlet UIView *selectorView;
+
 @property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
 
 @end
