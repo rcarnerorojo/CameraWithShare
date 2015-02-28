@@ -21,13 +21,14 @@
     
     RCRCameraViewController *cVC = [[RCRCameraViewController alloc] initWithNibName:nil bundle:nil];
     
-    UINavigationController *nC = [[UINavigationController alloc]initWithRootViewController:cVC];
+    //UINavigationController *nC = [[UINavigationController alloc]initWithRootViewController:cVC];
     
-    self.window.rootViewController = nC;
+    self.window.rootViewController = cVC;
     
     // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor blackColor];
+//    self.window.backgroundColor = [UIColor blackColor];
     [self.window makeKeyAndVisible];
+    
     return YES;
 }
 

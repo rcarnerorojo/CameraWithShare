@@ -15,6 +15,6 @@
 @property (weak, nonatomic) IBOutlet UIView *overlayView;
 @property (weak, nonatomic) IBOutlet UIView *selectorView;
 
-@property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
+//@property (strong, nonatomic) UIActivityIndicatorView *activityIndicator;
 
 @end

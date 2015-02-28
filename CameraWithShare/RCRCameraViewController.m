@@ -6,14 +6,17 @@
 //  Copyright (c) 2015 Ramón Carnero Rojo. All rights reserved.
 //
 
+#define albumName @"CameraWithShare"
+
 #import "RCRCameraViewController.h"
+#import <MobileCoreServices/MobileCoreServices.h>
+@import AssetsLibrary;
 
 @interface RCRCameraViewController ()
-
-@property (strong, nonatomic) NSURL* urlVideo;
 @property BOOL cameraCaptureModeVideo;
 @property (strong, nonatomic) UIImage* photo;
-
+@property (strong, nonatomic) ALAssetsLibrary *library;
+@property (strong, nonatomic) ALAssetsGroup *groupToAddTo;
 @end
 
 @implementation RCRCameraViewController
@@ -22,12 +25,35 @@
     [super viewDidLoad];
     
     self.cameraCaptureModeVideo = YES;
+
+    //AssetsLibrary para agrupar las fotos y vídeos en un album propio
+    self.library = [[ALAssetsLibrary alloc] init];
     
-    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame: CGRectMake(139, 270, 37, 37)];
-    self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
-    [self.imagePicker.view addSubview:self.activityIndicator];
-    self.activityIndicator.hidden = YES;
-    [self.activityIndicator stopAnimating];
+    [self.library addAssetsGroupAlbumWithName:albumName
+                             resultBlock:^(ALAssetsGroup *group) {
+                                 NSLog(@"added album:%@", albumName);
+                             }
+                            failureBlock:^(NSError *error) {
+                                NSLog(@"error adding album");
+                            }];
+    
+    [self.library enumerateGroupsWithTypes:ALAssetsGroupAlbum
+                           usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+                               if ([[group valueForProperty:ALAssetsGroupPropertyName] isEqualToString:albumName]) {
+                                   NSLog(@"found album %@", albumName);
+                                   self.groupToAddTo = group;
+                               }
+                           }
+                         failureBlock:^(NSError* error) {
+                             NSLog(@"failed to enumerate albums:\nError: %@", [error localizedDescription]);
+                         }];
+    
+    
+//    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithFrame: CGRectMake(139, 270, 37, 37)];
+//    self.activityIndicator.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
+//    [self.imagePicker.view addSubview:self.activityIndicator];
+//    self.activityIndicator.hidden = YES;
+//    [self.activityIndicator stopAnimating];
 }
 
 -(void)viewDidAppear:(BOOL)animated{
@@ -57,14 +83,15 @@
 }
 
 - (void) createImagePickerRecord {
+    
     self.imagePicker = [[UIImagePickerController alloc] init];
     self.imagePicker.delegate = self;
     
     self.imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
     
-    self.imagePicker.mediaTypes = [NSArray arrayWithObject:@"public.movie"];
+    self.imagePicker.mediaTypes = @[(NSString *)kUTTypeMovie];
     self.imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModeVideo;
-    
+
     self.imagePicker.allowsEditing = NO;
     self.imagePicker.showsCameraControls = YES;
     
@@ -96,6 +123,7 @@
     
     self.imagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
     self.imagePicker.cameraCaptureMode = UIImagePickerControllerCameraCaptureModePhoto;
+    self.imagePicker.mediaTypes = @[(NSString *)kUTTypeImage];
     
     CGRect rect = CGRectMake(0, 0, 320, 470);
     [self.overlayView setFrame:rect];
@@ -112,59 +140,90 @@
         BOOL okToSaveVideo = UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(pathToVideo);
         
         if (okToSaveVideo) {
-            self.urlVideo = videoURL;
-            UISaveVideoAtPathToSavedPhotosAlbum(pathToVideo, self, @selector(video:didFinishSavingWithError:contextInfo:), NULL);
-        } else {
-            [self video:pathToVideo didFinishSavingWithError:nil contextInfo:NULL];
+            
+            [self.library writeVideoAtPathToSavedPhotosAlbum:videoURL completionBlock:^(NSURL *assetURL, NSError *error) {
+                if (error.code == 0) {
+                    NSLog(@"saved image completed:\nurl: %@ \nvideoURL: %@", assetURL, videoURL);
+                    
+                    // try to get the asset
+                    [self.library assetForURL:assetURL
+                                  resultBlock:^(ALAsset *asset) {
+                                      // assign the photo to the album
+                                      [self.groupToAddTo addAsset:asset];
+                                      NSLog(@"Added %@ to %@", [[asset defaultRepresentation] filename], albumName);
+                                      
+                                      UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Video Guardado" message:@"Almacenado en el carrete" preferredStyle:UIAlertControllerStyleAlert];
+                                      
+                                      UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                                                            handler:^(UIAlertAction * action) {[self share:videoURL];}];
+                                      [alert addAction:defaultAction];
+                                      [self.imagePicker presentViewController:alert animated:NO completion:NULL];
+                                      
+                                  }
+                                 failureBlock:^(NSError* error) {
+                                     NSLog(@"failed to retrieve image asset:\nError: %@ ", [error localizedDescription]);
+                                 }];
+                }
+                else {
+                    NSLog(@"saved image failed.\nerror code %li\n%@", (long)error.code, [error localizedDescription]);
+                    //Deprecated
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Guardado incorrecto"  delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles: nil, nil];
+                    [alert show];
+                }
+            }];
+            
+            
         }
     }else{
         
         UIImage *photo = [info valueForKey:UIImagePickerControllerOriginalImage];
         self.photo = photo;
-        UIImageWriteToSavedPhotosAlbum(photo, self, @selector(image:didFinishSavingWithError:contextInfo:), NULL);
+        
+        CGImageRef img = [photo CGImage];
+        [self.library writeImageToSavedPhotosAlbum:img
+                                          metadata:[info objectForKey:UIImagePickerControllerMediaMetadata]
+                                   completionBlock:^(NSURL* assetURL, NSError* error) {
+                                       if (error.code == 0) {
+                                           NSLog(@"saved image completed:\nurl: %@", assetURL);
+                                           
+                                           // try to get the asset
+                                           [self.library assetForURL:assetURL
+                                                         resultBlock:^(ALAsset *asset) {
+                                                             // assign the photo to the album
+                                                             [self.groupToAddTo addAsset:asset];
+                                                             NSLog(@"Added %@ to %@", [[asset defaultRepresentation] filename], albumName);
+                                                             
+                                                             UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Foto Guardada" message:@"Almacenada en el carrete" preferredStyle:UIAlertControllerStyleAlert];
+                                                             
+                                                             UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                                                                                                   handler:^(UIAlertAction * action) {[self share:self.photo];}];
+                                                             
+                                                             [alert addAction:defaultAction];
+                                                             [self.imagePicker presentViewController:alert animated:NO completion:NULL];
+                                                             
+                                                         }
+                                                        failureBlock:^(NSError* error) {
+                                                            NSLog(@"failed to retrieve image asset:\nError: %@ ", [error localizedDescription]);
+                                                        }];
+                                       }
+                                       else {
+                                           NSLog(@"saved image failed.\nerror code %li\n%@", (long)error.code, [error localizedDescription]);
+                                           
+                                           //Deprecated
+                                           UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Guardado incorrecto"  delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles: nil, nil];
+                                           [alert show];
+                                           
+                                       }
+                                   }];
+        
     }
-
+    
     [self dismissViewControllerAnimated:NO completion:NULL];
 }
 
 - (void) imagePickerControllerDidCancel: (UIImagePickerController *) picker {
     
-    NSLog(@"Cancel, en una App normal quitaríamos el view controller de la cámara");
     [self dismissViewControllerAnimated:NO completion:^{}];
-}
-
-- (void)video:(NSString*)videoPath didFinishSavingWithError:(NSError*)error contextInfo:(void*)contextInfo
-{
-    if (error) {
-        //Deprecated
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Guardado incorrecto"  delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles: nil, nil];
-        [alert show];
-    }else{
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Video Guardado" message:@"Almacenado en el carrete" preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-                                                              handler:^(UIAlertAction * action) {[self share:self.urlVideo];}];
-        
-        [alert addAction:defaultAction];
-        [self.imagePicker presentViewController:alert animated:NO completion:NULL];
-    }
-}
-
-- (void)image:(UIImage*)photo didFinishSavingWithError:(NSError*)error contextInfo:(void*)contextInfo
-{
-    if (error) {
-        //Deprecated
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Guardado incorrecto"  delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles: nil, nil];
-        [alert show];
-    }else{
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Foto Guardada" message:@"Almacenada en el carrete" preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction* defaultAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
-                                                              handler:^(UIAlertAction * action) {[self share:self.photo];}];
-        
-        [alert addAction:defaultAction];
-        [self.imagePicker presentViewController:alert animated:NO completion:NULL];
-    }
 }
 
 //Hay que tener mucho cuidado con la jerarquía de vistas. Tengo que mostrar el AlertControl encima del picker. Si lo presento en la view, estaré presentándolo detrás del picker. El sistema eliminará datos del AlertControl para ahorrar memoria, fallando.
@@ -194,14 +253,14 @@
         [self.imagePicker presentViewController:activityVC
                            animated:YES
                          completion:^(){
-                             [self.activityIndicator startAnimating];
-                             self.activityIndicator.hidden = NO;
+//                             [self.activityIndicator startAnimating];
+//                             self.activityIndicator.hidden = NO;
                          }];
         
         [activityVC setCompletionWithItemsHandler:
          ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-             [self.activityIndicator stopAnimating];
-             self.activityIndicator.hidden = YES;
+//             [self.activityIndicator stopAnimating];
+//             self.activityIndicator.hidden = YES;
              
              if (completed){
                  NSLog(@"Activity: %@ Share completado",activityType);
@@ -226,7 +285,6 @@
                                  self.selectorView.transform = CGAffineTransformMakeTranslation(-44, 0);
                          }
                          completion:^(BOOL finished){
-                             NSLog(@"cambio el tipo de cámara");
                              self.cameraCaptureModeVideo = !self.cameraCaptureModeVideo;
                              [self dismissViewControllerAnimated:NO completion:NULL];
                          }];
@@ -238,7 +296,6 @@
                                  self.selectorView.transform = CGAffineTransformMakeTranslation(0, 0);
                          }
                          completion:^(BOOL finished){
-                             NSLog(@"cambio el tipo de cámara");
                              self.cameraCaptureModeVideo = !self.cameraCaptureModeVideo;
                              [self dismissViewControllerAnimated:NO completion:NULL];
                          }];

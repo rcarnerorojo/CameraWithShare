@@ -14,6 +14,7 @@
 		E67DDB071A9C9ED5005FD091 /* CameraWithShareTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E67DDB061A9C9ED5005FD091 /* CameraWithShareTests.m */; };
 		E67DDB131A9C9EFD005FD091 /* RCRCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E67DDB111A9C9EFD005FD091 /* RCRCameraViewController.m */; };
 		E67DDB141A9C9EFD005FD091 /* RCRCameraViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = E67DDB121A9C9EFD005FD091 /* RCRCameraViewController.xib */; };
+		E6E5CD501AA0D5D10065F427 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6E5CD4F1AA0D5D10065F427 /* MobileCoreServices.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,7 @@
 		E67DDB101A9C9EFD005FD091 /* RCRCameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCRCameraViewController.h; sourceTree = "<group>"; };
 		E67DDB111A9C9EFD005FD091 /* RCRCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCRCameraViewController.m; sourceTree = "<group>"; };
 		E67DDB121A9C9EFD005FD091 /* RCRCameraViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = RCRCameraViewController.xib; sourceTree = "<group>"; };
+		E6E5CD4F1AA0D5D10065F427 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E6E5CD501AA0D5D10065F427 /* MobileCoreServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -63,6 +66,7 @@
 		E67DDAE41A9C9ED5005FD091 = {
 			isa = PBXGroup;
 			children = (
+				E6E5CD4F1AA0D5D10065F427 /* MobileCoreServices.framework */,
 				E67DDAEF1A9C9ED5005FD091 /* CameraWithShare */,
 				E67DDB031A9C9ED5005FD091 /* CameraWithShareTests */,
 				E67DDAEE1A9C9ED5005FD091 /* Products */,
